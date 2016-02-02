@@ -1,0 +1,9 @@
+# iGnore all dot files and directories
+.*
+
+# except these
+!.gitignore
+!.classpath
+
+bin/
+build/
