@@ -13,10 +13,9 @@ public class OurGame extends BasicGame {
 	}
 
 	public static void main(String[] args) {
-		//System.setProperty("org.lwjgl.librarypath", "/Users/jhayduk/Workspace-personal/OurGame/build/natives/osx");
 		try {
 			AppGameContainer app = new AppGameContainer(new OurGame("Our Game"));
-			app.setDisplayMode(500, 400, false);
+			app.setDisplayMode(Screen.getWidthPx(), Screen.getHeightPx(), false);
 			app.start();
 		} catch (SlickException e) {
 			e.printStackTrace();
@@ -29,13 +28,13 @@ public class OurGame extends BasicGame {
 	}
 
 	@Override
-	public void render(GameContainer arg0, Graphics arg1) throws SlickException {
-		
+	public void render(GameContainer gameContainer, Graphics graphics) throws SlickException {
+		WorldMap.render();
 	}
 
 	@Override
 	public void update(GameContainer arg0, int arg1) throws SlickException {
-		
+		WorldMap.update();
 	}
 
 	

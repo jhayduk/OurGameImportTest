@@ -1,9 +1,10 @@
-# iGnore all dot files and directories
+# Ignore all dot files and directories
 .*
 
 # except these
 !.gitignore
 !.classpath
 
+*.log
 bin/
 build/
