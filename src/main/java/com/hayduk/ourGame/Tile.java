@@ -15,7 +15,7 @@ public class Tile {
 
 	public Tile(Coordinate location) throws SlickException {
 		this.location = location;
-		image = new Image("/Users/jhayduk/Workspace-personal/OurGame/src/images/grass.png");
+		image = new Image("src/images/grass.png");
 	}
 	
 	public Image getImage() {
@@ -43,7 +43,7 @@ public class Tile {
 	}
 
 	public String getType() {
-		return("/Users/jhayduk/Workspace-personal/OurGame/src/images/grass.png");
+		return("src/images/grass.png");
 	}
 
 	public void draw() {

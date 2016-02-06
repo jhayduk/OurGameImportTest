@@ -9,9 +9,16 @@ public class Screen {
 	private static int heightPx = 480;
 	
 	// The current center of the screen
-	// TODO - Get the saved center from the database
-	private static Coordinate center = new Coordinate(0.0, 0.0);
+	private static Coordinate center;
+	
+	// These values are frequently needed so are calculated from the
+	// center when it is changed
+	private static double minX, maxX, minY, maxY;
 
+	public static void init() {
+		// TODO - Get the saved center from the database
+		setCenter(new Coordinate(0.0, 0.0));
+	}
 	public static int getWidthPx() {
 		return widthPx;
 	}
@@ -29,6 +36,35 @@ public class Screen {
 	}
 	public static void setCenter(Coordinate center) {
 		Screen.center = center;
+		double halfScreenWidth = ((widthPx/2)*Config.getCubitsPerPixel());
+		double halfScreenHeight = ((heightPx/2)*Config.getCubitsPerPixel());
+		setMinX(center.getX()-halfScreenWidth);
+		setMaxX(center.getX()+halfScreenWidth);
+		setMinY(center.getY()-halfScreenHeight);
+		setMaxY(center.getY()+halfScreenHeight);
 	}
-
+	public static double getMinX() {
+		return minX;
+	}
+	public static void setMinX(double minX) {
+		Screen.minX = minX;
+	}
+	public static double getMaxX() {
+		return maxX;
+	}
+	public static void setMaxX(double maxX) {
+		Screen.maxX = maxX;
+	}
+	public static double getMinY() {
+		return minY;
+	}
+	public static void setMinY(double minY) {
+		Screen.minY = minY;
+	}
+	public static double getMaxY() {
+		return maxY;
+	}
+	public static void setMaxY(double maxY) {
+		Screen.maxY = maxY;
+	}
 }

@@ -24,6 +24,7 @@ public class OurGame extends BasicGame {
 	
 	@Override
 	public void init(GameContainer container) throws SlickException {
+		Screen.init();
 		WorldMap.init();
 	}
 

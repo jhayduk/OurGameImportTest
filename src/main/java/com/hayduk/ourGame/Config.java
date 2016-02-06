@@ -27,4 +27,7 @@ public class Config {
 	public static double getPixelsPerCubit() { 
 		return (getTileWidthPx()/getTileWidth());
 	}
+	public static double getCubitsPerPixel() {
+		return (1/getPixelsPerCubit());
+	}
 }

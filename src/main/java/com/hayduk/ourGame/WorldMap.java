@@ -1,9 +1,11 @@
 package com.hayduk.ourGame;
 
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
+import com.mongodb.client.model.Filters;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
@@ -47,7 +49,9 @@ public class WorldMap {
 
 	public static void render() throws SlickException {		
 		// Find all of the tiles that will be on the screen
-		Document query = new Document();
+		Bson query = Filters.and(
+				Filters.and(Filters.gte("x", Screen.getMinX()),Filters.lte("x", Screen.getMaxX())),
+				Filters.and(Filters.gte("y", Screen.getMinY()),Filters.lte("y", Screen.getMaxY())));
 		MongoCursor<Document> cursor = collection.find(query).iterator();
 		
 		// Render each tile
@@ -67,7 +71,7 @@ public class WorldMap {
 	private static void insert(Tile tile) {
 		Document insertDocument = new Document()
 				.append("x", tile.getLocation().getX())
-				.append("y", tile.getLocation().getX())
+				.append("y", tile.getLocation().getY())
 				.append("traversable", tile.isTraversable())
 				.append("tileType", tile.getType());
 		collection.insertOne(insertDocument);
