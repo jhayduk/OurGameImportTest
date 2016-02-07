@@ -2,7 +2,6 @@ package com.hayduk.ourGame;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
 import com.mongodb.MongoClient;
@@ -26,10 +25,6 @@ public class WorldMap {
 	private static MongoDatabase database;
 	private static MongoCollection<Document> collection;
 	
-	// TODO - poor man's image cache of one.
-	private static Image lastImage;
-	private static String lastImageType;
-
 	public static void init () throws SlickException {
 		mongoClient = new MongoClient( "localhost" , 27017 );
 		database = mongoClient.getDatabase("ourGame");
@@ -101,7 +96,8 @@ public class WorldMap {
 		for (Vector vector : Vector.IMMEDIATE_NEIGHBOR_VECTORS) {
 			Coordinate newTileLocation = new Coordinate(tile.getLocation(), vector);
 			if (!locationHasTile(newTileLocation)) {
-				insert(new Tile(newTileLocation));
+				Tile newTile = TileSpawner.spawn(tile, newTileLocation);
+				insert(newTile);
 			}
 		}
 	}
@@ -116,23 +112,16 @@ public class WorldMap {
 		Document insertDocument = new Document()
 				.append("x", tile.getLocation().getX())
 				.append("y", tile.getLocation().getY())
-				.append("traversable", tile.isTraversable())
-				.append("tileType", tile.getType());
+				.append("walkable", tile.isWalkable())
+				.append("tileType", tile.getTileType());
 		collection.insertOne(insertDocument);
 	}
 
 	private static Tile documentToTile(Document document) throws SlickException {
 		Tile tile = new Tile();
-		String tileType = document.getString("tileType");
 		tile.setLocation(new Coordinate(document.getDouble("x"), document.getDouble("y")));
-		if (tileType.equalsIgnoreCase(lastImageType)) {
-			tile.setImage(lastImage);
-		} else {
-			tile.setImage(new Image(tileType));
-			lastImageType = tileType;
-			lastImage = tile.getImage();
-		}
-		tile.setTraversable(document.getBoolean("traversable"));
+		tile.setTileType(document.getString("tileType"));
+		tile.setWalkable(document.getBoolean("walkable"));
 		return (tile);
 	}
 }

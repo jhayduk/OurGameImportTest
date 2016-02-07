@@ -20,6 +20,12 @@ public class Config {
 	// in pixels
 	public static int getTileSizePx() { return (32); }
 	public static int getHalfTileSizePx() { return (getTileSizePx()/2); }
+
+	//
+	// The probability that a newly spawned tile will be the same type as
+	// the neighbor from which it spawned
+	//
+	public static double getTileAffinity() { return 0.75; }
 	
 	//
 	// Calculated values
