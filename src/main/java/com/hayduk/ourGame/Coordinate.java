@@ -9,7 +9,8 @@ package com.hayduk.ourGame;
 public class Coordinate {
 	
 	// The "real" location in space in cubits
-	private double x, y;
+	protected double x;
+	protected double y;
 	
 	public Coordinate() {
 		x = 0;
@@ -24,9 +25,15 @@ public class Coordinate {
 		y = coordinates[1];
 	}
 	
-	public Coordinate(double worldX, double worldY) {
-		this.x = worldX;
-		this.y = worldY;
+	public Coordinate(double x, double y) {
+		this.x = x;
+		this.y = y;
+	}
+	
+	// Create a coordinate offset from another coordinate
+	public Coordinate(Coordinate origin, Vector translation) {
+		x = origin.getX() + translation.getX();
+		y = origin.getY() + translation.getY();
 	}
 	
 	public double getX() {
@@ -63,5 +70,10 @@ public class Coordinate {
 //				+ ", Screen.getHeightPx()/2 : " + (Screen.getHeightPx()/2)
 //				+ ") -> " + ((Screen.getHeightPx()/2) - (getYScreen() * Config.getPixelsPerCubit())));
 			return ((Screen.getHeightPx()/2) - (getYScreen() * Config.getPixelsPerCubit()));
+	}
+
+	@Override
+	public String toString() {
+		return "Coordinate [x=" + x + ", y=" + y + "]";
 	}
 }

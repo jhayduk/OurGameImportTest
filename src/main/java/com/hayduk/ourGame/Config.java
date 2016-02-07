@@ -13,19 +13,19 @@ package com.hayduk.ourGame;
 public class Config {
 
 	//
-	// Tiles are square. The width is the length of one side.
+	// Tiles are square.
 	//
 	// in cubits
-	public static double getTileWidth() { return (2.0); }
+	public static double getTileSize() { return (2.0); }
 	// in pixels
-	public static int getTileWidthPx() { return (32); }
-	public static int getTileHalfWidthPx() { return (getTileWidthPx()/2); }
+	public static int getTileSizePx() { return (32); }
+	public static int getHalfTileSizePx() { return (getTileSizePx()/2); }
 	
 	//
 	// Calculated values
 	//
 	public static double getPixelsPerCubit() { 
-		return (getTileWidthPx()/getTileWidth());
+		return (getTileSizePx()/getTileSize());
 	}
 	public static double getCubitsPerPixel() {
 		return (1/getPixelsPerCubit());

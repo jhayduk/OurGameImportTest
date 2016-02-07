@@ -8,7 +8,7 @@ public class Tile {
 	private Coordinate location = new Coordinate(0,0);
 	private Image image;
 	private boolean traversable = true;
-
+	
 	public Tile() {
 		
 	}
@@ -46,8 +46,13 @@ public class Tile {
 		return("src/images/grass.png");
 	}
 
+	@Override
+	public String toString() {
+		return "Tile [location=" + location + ", image=" + image + ", traversable=" + traversable + "]";
+	}
+
 	public void draw() {
-		image.draw((float)location.getXPx()-Config.getTileHalfWidthPx(),
-				(float)location.getYPx()-Config.getTileHalfWidthPx());
+		image.draw((float)location.getXPx()-Config.getHalfTileSizePx(),
+				(float)location.getYPx()-Config.getHalfTileSizePx());
 	}
 }

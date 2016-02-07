@@ -15,6 +15,7 @@ public class OurGame extends BasicGame {
 	public static void main(String[] args) {
 		try {
 			AppGameContainer app = new AppGameContainer(new OurGame("Our Game"));
+			Screen.init();
 			app.setDisplayMode(Screen.getWidthPx(), Screen.getHeightPx(), false);
 			app.start();
 		} catch (SlickException e) {
@@ -24,7 +25,6 @@ public class OurGame extends BasicGame {
 	
 	@Override
 	public void init(GameContainer container) throws SlickException {
-		Screen.init();
 		WorldMap.init();
 	}
 
