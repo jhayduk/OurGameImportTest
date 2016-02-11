@@ -12,6 +12,11 @@ package com.hayduk.ourGame;
  */
 public class Config {
 
+	// Normally false, if true, collections are dropped on startup
+	public static boolean getDropCollectionsOnStartup() {
+		return true;
+	}
+	
 	//
 	// Tiles are square.
 	//
@@ -25,7 +30,7 @@ public class Config {
 	// The probability that a newly spawned tile will be the same type as
 	// the neighbor from which it spawned
 	//
-	public static double getTileAffinity() { return 0.75; }
+	public static double getDefaultTileTypeAffinity() { return 0.95; }
 	
 	//
 	// Calculated values

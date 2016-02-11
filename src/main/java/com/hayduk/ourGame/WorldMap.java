@@ -4,10 +4,8 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.newdawn.slick.SlickException;
 
-import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
-import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 
 //
@@ -21,29 +19,19 @@ import com.mongodb.client.model.Filters;
 //
 public class WorldMap {
 	
-	private static MongoClient mongoClient;
-	private static MongoDatabase database;
 	private static MongoCollection<Document> collection;
 	
-	public static void init () throws SlickException {
-		mongoClient = new MongoClient( "localhost" , 27017 );
-		database = mongoClient.getDatabase("ourGame");
-		collection = database.getCollection("worldMap");
-		//-v TODO Take this out!
-		collection.drop();
-		//-^ TODO Take this out!
-		collection.createIndex(new Document().append("x", 1).append("y", 1));
-
-
-		//
-		// A special case, but if the collection is empty, spawn one tile
-		// at the origin
-		//
+	public static void preWindowInit () throws SlickException {
+		collection = OurGameDatabase.getCollection("worldMap");
+		if (Config.getDropCollectionsOnStartup()) {
+			collection.drop();
+		}
 		if (collection.count() == 0) {
+			// Collection is blank - recreate it
 			Coordinate screenCenter = Screen.getCenter();
-
-			Tile tile = new Tile(new Coordinate(screenCenter.getX(), screenCenter.getY()));
+			Tile tile = new Tile(new Coordinate(screenCenter.getX(), screenCenter.getY()), "grass", true);
 			insert(tile);
+			collection.createIndex(new Document().append("x", 1).append("y", 1));
 		}
 	}
 
@@ -58,7 +46,7 @@ public class WorldMap {
 		
 		// Render each tile
 		while (cursor.hasNext()) {
-			Tile tile = documentToTile(cursor.next());
+			Tile tile = documentToDrawableTile(cursor.next());
 			tile.draw();
 		}
 	}
@@ -112,15 +100,26 @@ public class WorldMap {
 		Document insertDocument = new Document()
 				.append("x", tile.getLocation().getX())
 				.append("y", tile.getLocation().getY())
-				.append("walkable", tile.isWalkable())
-				.append("tileType", tile.getTileType());
+				.append("tileType", tile.getTileType())
+				.append("walkable", tile.isWalkable());
 		collection.insertOne(insertDocument);
 	}
 
-	private static Tile documentToTile(Document document) throws SlickException {
+	//
+	// This only extracts fields required for drawing a tile
+	//
+	private static Tile documentToDrawableTile(Document document) throws SlickException {
 		Tile tile = new Tile();
 		tile.setLocation(new Coordinate(document.getDouble("x"), document.getDouble("y")));
 		tile.setTileType(document.getString("tileType"));
+		return (tile);
+	}
+
+	//
+	// This extracts all of the fields
+	//
+	private static Tile documentToTile(Document document) throws SlickException {
+		Tile tile = documentToDrawableTile(document);
 		tile.setWalkable(document.getBoolean("walkable"));
 		return (tile);
 	}

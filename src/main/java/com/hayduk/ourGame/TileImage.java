@@ -20,7 +20,8 @@ public class TileImage {
 		Image image;
 		image = imageCache.get(tileType);
 		if (image == null) {
-			String imageFilename = "src/images/" + tileType + ".png";
+			TileInfo tileInfo = new TileInfo(tileType);
+			String imageFilename = tileInfo.getResourceLocation();
 			System.out.println("Loading " + imageFilename + "...");
 			image = new Image(imageFilename);
 			imageCache.put(tileType, image);

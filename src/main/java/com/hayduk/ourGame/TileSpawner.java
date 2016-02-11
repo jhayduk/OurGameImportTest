@@ -1,5 +1,6 @@
 package com.hayduk.ourGame;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import org.newdawn.slick.SlickException;
@@ -14,8 +15,16 @@ public class TileSpawner {
 	//
 	// Given a neighboringTile, create a new tile at the given coordinates
 	public static Tile spawn(Tile neighboringTile, Coordinate newTileLocation) throws SlickException {
-		Tile newTile = new Tile(newTileLocation);
-		// TODO Auto-generated method stub
+		// First we need to get the typical characteristics for the neighboring tile
+		TileInfo neighboringTileInfo = new TileInfo(neighboringTile.getTileType());
+		Tile newTile;
+		if (random.nextDouble() <= neighboringTileInfo.getTileTypeAffinity()) {
+			newTile = new Tile(newTileLocation, neighboringTile);
+		} else {
+			ArrayList<String> neighboringTileTypes = neighboringTileInfo.getNeighboringTileTypes();
+			int numChoices = neighboringTileTypes.size();
+			newTile = new Tile(newTileLocation, neighboringTileTypes.get(random.nextInt(numChoices)), false);
+		}
 		return newTile;
 	}
 	

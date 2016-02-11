@@ -16,7 +16,7 @@ public class Screen {
 	private static double minX, maxX, minY, maxY;
 	private static long numberOfTilesPerScreen;
 
-	public static void init() {
+	public static void preWindowInit() {
 		// TODO - Get the saved center from the database
 		setCenter(new Coordinate(0.0, 0.0));
 		setWidthPx(640);

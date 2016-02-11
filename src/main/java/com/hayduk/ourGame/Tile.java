@@ -7,19 +7,25 @@ public class Tile {
 	
 	private Coordinate location = new Coordinate(0,0);
 	private String tileType;
-	private boolean walkable = true;
-	
-	// The likelihood that a tile spawned as a neighbor to this tile
-	// will be of the same type
-	private double tileTypeAffinity = Config.getTileAffinity();
+	private boolean walkable;
 	
 	public Tile() {
 		
 	}
 
-	public Tile(Coordinate location) throws SlickException {
+	public Tile(Coordinate location, String tileType, boolean walkable) throws SlickException {
 		this.location = location;
-		this.tileType = "grass";
+		this.tileType = tileType;
+		this.walkable = walkable;
+	}
+	
+	//
+	// Clone a tile to a given location
+	//
+	public Tile(Coordinate location, Tile tileToClone) {
+		this.location = location;
+		this.tileType = tileToClone.getTileType();
+		this.walkable = tileToClone.isWalkable();
 	}
 	
 	public Coordinate getLocation() {
@@ -30,14 +36,6 @@ public class Tile {
 		this.location = location;
 	}
 
-	public boolean isWalkable () {
-		return walkable;
-	}
-	
-	public void setWalkable(boolean traversable) {
-		this.walkable = traversable;
-	}
-
 	public String getTileType() {
 		return(tileType);
 	}
@@ -46,18 +44,17 @@ public class Tile {
 		this.tileType = tileType;
 	}
 
-	public double getTileTypeAffinity() {
-		return tileTypeAffinity;
+	public boolean isWalkable() {
+		return walkable;
 	}
 
-	public void setTileTypeAffinity(int tileTypeAffinity) {
-		this.tileTypeAffinity = tileTypeAffinity;
+	public void setWalkable(boolean walkable) {
+		this.walkable = walkable;
 	}
 
 	@Override
 	public String toString() {
-		return "Tile [location=" + location + ", tileType=" + tileType + ", walkable=" + walkable
-				+ ", tileTypeAffinity=" + tileTypeAffinity + "]";
+		return "Tile [location=" + location + ", tileType=" + tileType + ", walkable=" + walkable + "]";
 	}
 
 	public void draw() throws SlickException {
