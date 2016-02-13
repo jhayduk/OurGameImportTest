@@ -72,6 +72,14 @@ public class Coordinate {
 			return ((Screen.getHeightPx()/2) - (getYScreen() * Config.getPixelsPerCubit()));
 	}
 
+	public double getCornerXPx() {
+		return (getXPx() -Config.getHalfTileSizePx());
+	}
+
+	public double getCornerYPx() {
+		return (getYPx() -Config.getHalfTileSizePx());
+	}
+
 	@Override
 	public String toString() {
 		return "Coordinate [x=" + x + ", y=" + y + "]";

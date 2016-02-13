@@ -37,6 +37,11 @@ public class TileInfo {
 		neighboringTileTypes = (ArrayList<String>)document.get("neighboringTileTypes");
 	}
 
+	//
+	// Create a brand new tileInfo. The intent is that the caller is
+	// probably getting ready to insert this in the collection (possibly
+	// after some further modification).
+	//
 	private TileInfo(String tileType, String resourceLocation, boolean walkable) {
 		this.tileType = tileType;
 		this.resourceLocation = resourceLocation;

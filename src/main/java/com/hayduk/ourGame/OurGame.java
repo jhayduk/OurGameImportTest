@@ -14,8 +14,10 @@ public class OurGame extends BasicGame {
 
 	public static void main(String[] args) throws SlickException {
 		TileInfo.preWindowInit();
+		CharacterInfo.preWindowInit();
 		Screen.preWindowInit();
 		WorldMap.preWindowInit();
+		Characters.preWindowInit();
 		try {
 			AppGameContainer app = new AppGameContainer(new OurGame("Our Game"));
 			app.setDisplayMode(Screen.getWidthPx(), Screen.getHeightPx(), false);
@@ -32,6 +34,7 @@ public class OurGame extends BasicGame {
 	@Override
 	public void render(GameContainer gameContainer, Graphics graphics) throws SlickException {
 		WorldMap.render();
+		Characters.render();
 	}
 
 	@Override

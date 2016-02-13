@@ -1,5 +1,9 @@
 package com.hayduk.ourGame;
 
+import org.bson.conversions.Bson;
+
+import com.mongodb.client.model.Filters;
+
 /***
  * The game screen
  */
@@ -82,4 +86,17 @@ public class Screen {
 	public static void setNumberOfTilesPerScreen(long numberOfTilesPerScreen) {
 		Screen.numberOfTilesPerScreen = numberOfTilesPerScreen;
 	}
+	
+	/***
+	 * Creates a Bson filter suitable for use with mongo queries that
+	 * specifies the extent of the screen using "x" and "y" fields
+	 */
+	public static Bson filter() {
+	    return (Filters.and(
+	    		Filters.gte("x", Screen.getMinX()),
+	    		Filters.lte("x", Screen.getMaxX()),
+	    		Filters.gte("y", Screen.getMinY()),
+	    		Filters.lte("y", Screen.getMaxY())));
+	}
+
 }

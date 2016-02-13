@@ -3,6 +3,9 @@ package com.hayduk.ourGame;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
+/***
+ * A single map tile in the game.
+ */
 public class Tile {
 	
 	private Coordinate location = new Coordinate(0,0);
@@ -10,7 +13,6 @@ public class Tile {
 	private boolean walkable;
 	
 	public Tile() {
-		
 	}
 
 	public Tile(Coordinate location, String tileType, boolean walkable) throws SlickException {
@@ -52,14 +54,14 @@ public class Tile {
 		this.walkable = walkable;
 	}
 
+	public void draw() throws SlickException {
+		Image image = TileImage.get(tileType);
+		image.draw((float)location.getCornerXPx(), (float)location.getCornerYPx());
+	}
+
 	@Override
 	public String toString() {
 		return "Tile [location=" + location + ", tileType=" + tileType + ", walkable=" + walkable + "]";
 	}
 
-	public void draw() throws SlickException {
-		Image image = TileImage.get(tileType);
-		image.draw((float)location.getXPx()-Config.getHalfTileSizePx(),
-				(float)location.getYPx()-Config.getHalfTileSizePx());
-	}
 }

@@ -8,15 +8,18 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Filters;
 
-//
-// Schema for the worldMap collection:
-// {
-//		"x" : <double>,
-//		"y" : <double>,
-//		"traversable" : <boolean>,
-//		"tileType" : <string>
-// }
-//
+/***
+ * This collection holds all of the tiles for the worldMap.
+ *
+ * Schema:
+ * {
+ *		"x" : <double>,
+ *		"y" : <double>,
+ *		"traversable" : <boolean>,
+ *		"tileType" : <string>
+ * }
+ */
+
 public class WorldMap {
 	
 	private static MongoCollection<Document> collection;
@@ -29,20 +32,20 @@ public class WorldMap {
 		if (collection.count() == 0) {
 			// Collection is blank - recreate it
 			Coordinate screenCenter = Screen.getCenter();
-			Tile tile = new Tile(new Coordinate(screenCenter.getX(), screenCenter.getY()), "grass", true);
+			Tile tile = new Tile(screenCenter, "grass", true);
 			insert(tile);
 			collection.createIndex(new Document().append("x", 1).append("y", 1));
 		}
 	}
 
+	/***
+	 * Renders all of the visible worldMap tiles on the screen.
+	 *
+	 * @throws SlickException
+	 */
 	public static void render() throws SlickException {		
 		// Find all of the tiles that will be on the screen
-		Bson filter = Filters.and(
-				Filters.gte("x", Screen.getMinX()),
-				Filters.lte("x", Screen.getMaxX()),
-				Filters.gte("y", Screen.getMinY()),
-				Filters.lte("y", Screen.getMaxY()));
-		MongoCursor<Document> cursor = collection.find(filter).iterator();
+		MongoCursor<Document> cursor = collection.find(Screen.filter()).iterator();
 		
 		// Render each tile
 		while (cursor.hasNext()) {
@@ -55,12 +58,7 @@ public class WorldMap {
 	// For WorldMap, update() needs to spawn any new tiles that are required.
 	//
 	public static void update() throws SlickException {
-		Bson filter = Filters.and(
-				Filters.gte("x", Screen.getMinX()),
-				Filters.lte("x", Screen.getMaxX()),
-				Filters.gte("y", Screen.getMinY()),
-				Filters.lte("y", Screen.getMaxY()));
-		long count = collection.count(filter);
+		long count = collection.count(Screen.filter());
 		if (count < Screen.getNumberOfTilesPerScreen()) {
 			// TODO - This can be improved
 			// In general, we should only have to spawn new tiles along
@@ -72,7 +70,7 @@ public class WorldMap {
 			// in all directions. For the new map case, this will take
 			// a few iterations to get the whole map done and will always
 			// result in extra spawns just off of the screen.
-			MongoCursor<Document> cursor = collection.find(filter).iterator();
+			MongoCursor<Document> cursor = collection.find(Screen.filter()).iterator();
 			while (cursor.hasNext()) {
 				Tile tile = documentToTile(cursor.next());
 				spawnNeighbors(tile);
@@ -105,9 +103,10 @@ public class WorldMap {
 		collection.insertOne(insertDocument);
 	}
 
-	//
-	// This only extracts fields required for drawing a tile
-	//
+	/***
+	 * This takes a worldMap document and extracts only those fields required
+	 * for drawing a tile
+	 */
 	private static Tile documentToDrawableTile(Document document) throws SlickException {
 		Tile tile = new Tile();
 		tile.setLocation(new Coordinate(document.getDouble("x"), document.getDouble("y")));
@@ -115,9 +114,9 @@ public class WorldMap {
 		return (tile);
 	}
 
-	//
-	// This extracts all of the fields
-	//
+	/***
+	 * This takes a worldMap document and all tile fields
+	 */
 	private static Tile documentToTile(Document document) throws SlickException {
 		Tile tile = documentToDrawableTile(document);
 		tile.setWalkable(document.getBoolean("walkable"));
