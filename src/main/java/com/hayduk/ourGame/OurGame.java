@@ -38,7 +38,8 @@ public class OurGame extends BasicGame {
 	}
 
 	@Override
-	public void update(GameContainer arg0, int arg1) throws SlickException {
+	public void update(GameContainer container, int deltaMs) throws SlickException {
+		InputHandler.update(container, deltaMs);
 		WorldMap.update();
 	}
 

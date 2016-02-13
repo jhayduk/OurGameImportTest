@@ -71,10 +71,15 @@ public class Screen {
 	public static void setMaxY(double maxY) {
 		Screen.maxY = maxY;
 	}
+	//
+	// Calculate the limits of the screen for search purposes. This includes
+	// a boarder of one tile size in all directions.
+	//
 	public static void recalculateScreenParameters() {
 		setNumberOfTilesPerScreen(((heightPx/Config.getTileSizePx()) * (widthPx/Config.getTileSizePx())));
-		double halfScreenWidth = ((widthPx/2)*Config.getCubitsPerPixel());
-		double halfScreenHeight = ((heightPx/2)*Config.getCubitsPerPixel());
+		double halfScreenWidth = ((widthPx/2)*Config.getCubitsPerPixel()) + Config.getCubitsPerTile();
+		double halfScreenHeight = ((heightPx/2)*Config.getCubitsPerPixel()) + Config.getCubitsPerTile();
+		setNumberOfTilesPerScreen((((heightPx+Config.getTileSizePx())/Config.getTileSizePx()) * ((widthPx+Config.getTileSizePx())/Config.getTileSizePx())));
 		setMinX(center.getX()-halfScreenWidth);
 		setMaxX(center.getX()+halfScreenWidth);
 		setMinY(center.getY()-halfScreenHeight);

@@ -17,15 +17,17 @@ public class Character {
 	private facingDirections facingDirection;
 	private String characterType;
 	private boolean player;
+	private String name;
 	
 	public Character() {
 	}
 
-	public Character(Coordinate location, facingDirections facingDirection, String characterType) {
+	public Character(Coordinate location, facingDirections facingDirection, String characterType, String name) {
 		this.location = location;
 		this.facingDirection = facingDirection;
 		this.characterType = characterType;
 		this.player = false;
+		this.name = name;
 	}
 
 	public Coordinate getLocation() {
@@ -53,6 +55,14 @@ public class Character {
 		this.player = player;
 	}
 	
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	public void draw() throws SlickException {
 		Image image = CharacterImage.get(characterType, location, facingDirection);
 		image.draw((float)location.getCornerXPx(), (float)location.getCornerYPx());
@@ -61,6 +71,6 @@ public class Character {
 	@Override
 	public String toString() {
 		return "Character [location=" + location + ", facingDirection=" + facingDirection + ", characterType="
-				+ characterType + ", player=" + player + "]";
+				+ characterType + ", player=" + player + ", name=" + name + "]";
 	}
 }

@@ -62,7 +62,7 @@ public class CharacterInfo {
 			// Collection is blank - recreate it
 			CharacterInfo characterInfo;
 			
-			characterInfo = new CharacterInfo("Male-Mage", "src/images/Male-Mage.png");
+			characterInfo = new CharacterInfo("Adam_Pre-Fall", "src/images/Adam_Pre-Fall.png");
 			insert(characterInfo);
 			
 			collection.createIndex(new Document("characterType", 1));

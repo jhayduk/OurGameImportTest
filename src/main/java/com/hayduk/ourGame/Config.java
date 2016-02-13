@@ -22,6 +22,7 @@ public class Config {
 	//
 	// in cubits
 	public static double getTileSize() { return (2.0); }
+	public static double getCubitsPerTile() { return getTileSize(); }
 	// in pixels
 	public static int getTileSizePx() { return (32); }
 	public static int getHalfTileSizePx() { return (getTileSizePx()/2); }
@@ -31,6 +32,14 @@ public class Config {
 	// the neighbor from which it spawned
 	//
 	public static double getDefaultTileTypeAffinity() { return 0.95; }
+	
+	//
+	// When walking, the speed a character has
+	//
+	public static double getWalkingSpeedTilesPerSecond() { return 2.0; }
+	public static double getWalkingSpeedCubitsPerMilliSecond() {
+		return (getWalkingSpeedTilesPerSecond() * getCubitsPerTile() * 0.001);
+	}
 	
 	//
 	// Calculated values

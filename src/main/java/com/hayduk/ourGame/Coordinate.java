@@ -80,6 +80,12 @@ public class Coordinate {
 		return (getYPx() -Config.getHalfTileSizePx());
 	}
 
+	// Translate this coordinate by the given vector
+	public void translate(Vector translation) {
+		x += translation.getX();
+		y += translation.getY();
+	}
+	
 	@Override
 	public String toString() {
 		return "Coordinate [x=" + x + ", y=" + y + "]";
