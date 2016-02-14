@@ -30,6 +30,14 @@ public class Coordinate {
 		this.y = y;
 	}
 	
+	/**
+	 * Create a coordinate as a clone of an existing coordinate
+	 */
+	public Coordinate(Coordinate origin) {
+		x = origin.getX();
+		y = origin.getY();
+	}
+	
 	// Create a coordinate offset from another coordinate
 	public Coordinate(Coordinate origin, Vector translation) {
 		x = origin.getX() + translation.getX();

@@ -1,9 +1,12 @@
 package com.hayduk.ourGame;
 
+import java.security.InvalidParameterException;
+
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.newdawn.slick.SlickException;
 
+import com.hayduk.ourGame.Character.facingDirections;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Filters;
@@ -11,20 +14,15 @@ import com.mongodb.client.model.Filters;
 /***
  * This collection holds all of the tiles for the worldMap.
  *
- * Schema:
- * {
- *		"x" : <double>,
- *		"y" : <double>,
- *		"traversable" : <boolean>,
- *		"tileType" : <string>
- * }
+ * Schema: { "x" : <double>, "y" : <double>, "traversable" : <boolean>,
+ * "tileType" : <string> }
  */
 
 public class WorldMap {
-	
+
 	private static MongoCollection<Document> collection;
-	
-	public static void preWindowInit () throws SlickException {
+
+	public static void preWindowInit() throws SlickException {
 		collection = OurGameDatabase.getCollection("worldMap");
 		if (Config.getDropCollectionsOnStartup()) {
 			collection.drop();
@@ -32,8 +30,16 @@ public class WorldMap {
 		if (collection.count() == 0) {
 			// Collection is blank - recreate it
 			Coordinate screenCenter = Screen.getCenter();
-			Tile tile = new Tile(screenCenter, "grass", true);
-			insert(tile);
+			for (int xIndex = -2; xIndex <= 2; xIndex++) {
+				for (int yIndex = -2; yIndex <= 2; yIndex++) {
+					Vector translation = new Vector(xIndex * Config.getCubitsPerTile(),
+							yIndex * Config.getCubitsPerTile());
+					Coordinate location = new Coordinate(screenCenter.getX(), screenCenter.getY());
+					location.translate(translation);
+					Tile tile = new Tile(location, "grass", true);
+					insert(tile);
+				}
+			}
 			collection.createIndex(new Document().append("x", 1).append("y", 1));
 		}
 	}
@@ -43,10 +49,10 @@ public class WorldMap {
 	 *
 	 * @throws SlickException
 	 */
-	public static void render() throws SlickException {		
+	public static void render() throws SlickException {
 		// Find all of the tiles that will be on the screen
 		MongoCursor<Document> cursor = collection.find(Screen.filter()).iterator();
-		
+
 		// Render each tile
 		while (cursor.hasNext()) {
 			Tile tile = documentToDrawableTile(cursor.next());
@@ -58,28 +64,10 @@ public class WorldMap {
 	// For WorldMap, update() needs to spawn any new tiles that are required.
 	//
 	public static void update() throws SlickException {
-		long count = collection.count(Screen.filter());
-		if (count < Screen.getNumberOfTilesPerScreen()) {
-			// TODO - This can be improved
-			// In general, we should only have to spawn new tiles along
-			// the edge as the player moves to new areas on the map.
-			// A special case is if the map is just being drawn for the
-			// first time.
-			// For now, though, we visit each of the currently matching
-			// tiles, and then check and spawn a neighbor for each one
-			// in all directions. For the new map case, this will take
-			// a few iterations to get the whole map done and will always
-			// result in extra spawns just off of the screen.
-			MongoCursor<Document> cursor = collection.find(Screen.filter()).iterator();
-			while (cursor.hasNext()) {
-				Tile tile = documentToTile(cursor.next());
-				spawnNeighbors(tile);
-			}
-		}
 	}
-	
-	private static void spawnNeighbors(Tile tile) throws SlickException {
-		for (Vector vector : Vector.IMMEDIATE_NEIGHBOR_VECTORS) {
+
+	private static void spawnNeighbors(Tile tile, facingDirections facingDirection) throws SlickException {
+		for (Vector vector : Vector.immediateNeighbors.get(facingDirection)) {
 			Coordinate newTileLocation = new Coordinate(tile.getLocation(), vector);
 			if (!locationHasTile(newTileLocation)) {
 				Tile newTile = TileSpawner.spawn(tile, newTileLocation);
@@ -95,10 +83,8 @@ public class WorldMap {
 	}
 
 	private static void insert(Tile tile) {
-		Document insertDocument = new Document()
-				.append("x", tile.getLocation().getX())
-				.append("y", tile.getLocation().getY())
-				.append("tileType", tile.getTileType())
+		Document insertDocument = new Document().append("x", tile.getLocation().getX())
+				.append("y", tile.getLocation().getY()).append("tileType", tile.getTileType())
 				.append("walkable", tile.isWalkable());
 		collection.insertOne(insertDocument);
 	}
@@ -121,5 +107,57 @@ public class WorldMap {
 		Tile tile = documentToDrawableTile(document);
 		tile.setWalkable(document.getBoolean("walkable"));
 		return (tile);
+	}
+
+	/**
+	 * The only time we need to check if we need to spawn new tiles is if the
+	 * player just moved, and then we only need to check in the direction the
+	 * player just moved.
+	 * 
+	 * @param facingDirection
+	 *            - The direction the player moved in
+	 * @param newPlayerLocation
+	 *            - The location the player just moved to
+	 * @throws SlickException 
+	 */
+	public static void updateFromPlayerMove(facingDirections facingDirection, Coordinate newPlayerLocation) throws SlickException {
+		Bson immediateNeighborFilter = null;
+		switch (facingDirection) {
+		case UP:
+			immediateNeighborFilter = Filters.and(
+					Filters.gte("x", newPlayerLocation.getX() - Config.getCubitsPerTile()),
+		    		Filters.lte("x", newPlayerLocation.getX() + Config.getCubitsPerTile()),
+		    		Filters.gte("y", newPlayerLocation.getY()),
+		    		Filters.lte("y", newPlayerLocation.getY() + Config.getCubitsPerTile()));
+			break;
+		case RIGHT:
+			immediateNeighborFilter = Filters.and(
+					Filters.gte("x", newPlayerLocation.getX()),
+		    		Filters.lte("x", newPlayerLocation.getX() + Config.getCubitsPerTile()),
+		    		Filters.gte("y", newPlayerLocation.getY() - Config.getCubitsPerTile()),
+		    		Filters.lte("y", newPlayerLocation.getY() + Config.getCubitsPerTile()));
+			break;
+		case DOWN:
+			immediateNeighborFilter = Filters.and(
+					Filters.gte("x", newPlayerLocation.getX() - Config.getCubitsPerTile()),
+		    		Filters.lte("x", newPlayerLocation.getX() + Config.getCubitsPerTile()),
+		    		Filters.gte("y", newPlayerLocation.getY() - Config.getCubitsPerTile()),
+		    		Filters.lte("y", newPlayerLocation.getY()));
+			break;
+		case LEFT:
+			immediateNeighborFilter = Filters.and(
+					Filters.gte("x", newPlayerLocation.getX() - Config.getCubitsPerTile()),
+		    		Filters.lte("x", newPlayerLocation.getX()),
+		    		Filters.gte("y", newPlayerLocation.getY() - Config.getCubitsPerTile()),
+		    		Filters.lte("y", newPlayerLocation.getY() + Config.getCubitsPerTile()));
+			break;
+		default:
+			throw new InvalidParameterException("Unknown facingDirection : " + facingDirection.toString());
+		}
+		MongoCursor<Document> cursor = collection.find(immediateNeighborFilter).iterator();
+		while (cursor.hasNext()) {
+			Tile tile = documentToTile(cursor.next());
+			spawnNeighbors(tile, facingDirection);
+		}
 	}
 }

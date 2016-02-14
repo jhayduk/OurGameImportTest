@@ -46,5 +46,6 @@ public class Player {
 		player.setLocation(newPlayerLocation);
 		Characters.saveAfterMove(player);
 		Screen.setCenter(newPlayerLocation);
+		WorldMap.updateFromPlayerMove(facingDirection, newPlayerLocation);
 	}
 }
