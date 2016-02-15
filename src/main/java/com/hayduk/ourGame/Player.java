@@ -42,8 +42,8 @@ public class Player {
 			break;
 		}
 		Coordinate newPlayerLocation = player.getLocation();
+		newPlayerLocation.translate(translationVector);
 		if (WorldMap.clearToMove(facingDirection, newPlayerLocation)) {
-			newPlayerLocation.translate(translationVector);
 			player.setLocation(newPlayerLocation);
 			Characters.saveAfterMove(player);
 			Screen.setCenter(newPlayerLocation);
