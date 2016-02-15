@@ -23,7 +23,7 @@ public class TileSpawner {
 		} else {
 			ArrayList<String> neighboringTileTypes = neighboringTileInfo.getNeighboringTileTypes();
 			int numChoices = neighboringTileTypes.size();
-			newTile = new Tile(newTileLocation, neighboringTileTypes.get(random.nextInt(numChoices)), false);
+			newTile = new Tile(newTileLocation, neighboringTileTypes.get(random.nextInt(numChoices)));
 		}
 		return newTile;
 	}

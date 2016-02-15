@@ -110,6 +110,48 @@ public class WorldMap {
 	}
 
 	/**
+	 * Given a direction and location we proposing to move to or are moving to,
+	 * return a filter that can be used in a search to find the neighbors
+	 * immediately affected.
+	 */
+	private static Bson immediateNeighborFilter(facingDirections facingDirection, Coordinate newPlayerLocation,
+			double searchTileWidth) {
+		Bson immediateNeighborFilter = null;
+		switch (facingDirection) {
+		case UP:
+			immediateNeighborFilter = Filters.and(
+					Filters.gte("x", newPlayerLocation.getX() - (Config.getCubitsPerTile() * searchTileWidth)),
+					Filters.lte("x", newPlayerLocation.getX() + (Config.getCubitsPerTile() * searchTileWidth)),
+					Filters.gte("y", newPlayerLocation.getY()),
+					Filters.lte("y", newPlayerLocation.getY() + (Config.getCubitsPerTile() * searchTileWidth)));
+			break;
+		case RIGHT:
+			immediateNeighborFilter = Filters.and(Filters.gte("x", newPlayerLocation.getX()),
+					Filters.lte("x", newPlayerLocation.getX() + (Config.getCubitsPerTile() * searchTileWidth)),
+					Filters.gte("y", newPlayerLocation.getY() - (Config.getCubitsPerTile() * searchTileWidth)),
+					Filters.lte("y", newPlayerLocation.getY() + (Config.getCubitsPerTile()) * searchTileWidth));
+			break;
+		case DOWN:
+			immediateNeighborFilter = Filters.and(
+					Filters.gte("x", newPlayerLocation.getX() - (Config.getCubitsPerTile() * searchTileWidth)),
+					Filters.lte("x", newPlayerLocation.getX() + (Config.getCubitsPerTile() * searchTileWidth)),
+					Filters.gte("y", newPlayerLocation.getY() - (Config.getCubitsPerTile() * searchTileWidth)),
+					Filters.lte("y", newPlayerLocation.getY()));
+			break;
+		case LEFT:
+			immediateNeighborFilter = Filters.and(
+					Filters.gte("x", newPlayerLocation.getX() - (Config.getCubitsPerTile() * searchTileWidth)),
+					Filters.lte("x", newPlayerLocation.getX()),
+					Filters.gte("y", newPlayerLocation.getY() - (Config.getCubitsPerTile() * searchTileWidth)),
+					Filters.lte("y", newPlayerLocation.getY() + (Config.getCubitsPerTile() * searchTileWidth)));
+			break;
+		default:
+			throw new InvalidParameterException("Unknown facingDirection : " + facingDirection.toString());
+		}
+		return immediateNeighborFilter;
+	}
+
+	/**
 	 * The only time we need to check if we need to spawn new tiles is if the
 	 * player just moved, and then we only need to check in the direction the
 	 * player just moved.
@@ -118,46 +160,34 @@ public class WorldMap {
 	 *            - The direction the player moved in
 	 * @param newPlayerLocation
 	 *            - The location the player just moved to
-	 * @throws SlickException 
+	 * @throws SlickException
 	 */
-	public static void updateFromPlayerMove(facingDirections facingDirection, Coordinate newPlayerLocation) throws SlickException {
-		Bson immediateNeighborFilter = null;
-		switch (facingDirection) {
-		case UP:
-			immediateNeighborFilter = Filters.and(
-					Filters.gte("x", newPlayerLocation.getX() - Config.getCubitsPerTile()),
-		    		Filters.lte("x", newPlayerLocation.getX() + Config.getCubitsPerTile()),
-		    		Filters.gte("y", newPlayerLocation.getY()),
-		    		Filters.lte("y", newPlayerLocation.getY() + Config.getCubitsPerTile()));
-			break;
-		case RIGHT:
-			immediateNeighborFilter = Filters.and(
-					Filters.gte("x", newPlayerLocation.getX()),
-		    		Filters.lte("x", newPlayerLocation.getX() + Config.getCubitsPerTile()),
-		    		Filters.gte("y", newPlayerLocation.getY() - Config.getCubitsPerTile()),
-		    		Filters.lte("y", newPlayerLocation.getY() + Config.getCubitsPerTile()));
-			break;
-		case DOWN:
-			immediateNeighborFilter = Filters.and(
-					Filters.gte("x", newPlayerLocation.getX() - Config.getCubitsPerTile()),
-		    		Filters.lte("x", newPlayerLocation.getX() + Config.getCubitsPerTile()),
-		    		Filters.gte("y", newPlayerLocation.getY() - Config.getCubitsPerTile()),
-		    		Filters.lte("y", newPlayerLocation.getY()));
-			break;
-		case LEFT:
-			immediateNeighborFilter = Filters.and(
-					Filters.gte("x", newPlayerLocation.getX() - Config.getCubitsPerTile()),
-		    		Filters.lte("x", newPlayerLocation.getX()),
-		    		Filters.gte("y", newPlayerLocation.getY() - Config.getCubitsPerTile()),
-		    		Filters.lte("y", newPlayerLocation.getY() + Config.getCubitsPerTile()));
-			break;
-		default:
-			throw new InvalidParameterException("Unknown facingDirection : " + facingDirection.toString());
-		}
+	public static void updateFromPlayerMove(facingDirections facingDirection, Coordinate newPlayerLocation)
+			throws SlickException {
+		Bson immediateNeighborFilter = WorldMap.immediateNeighborFilter(facingDirection, newPlayerLocation, 1);
 		MongoCursor<Document> cursor = collection.find(immediateNeighborFilter).iterator();
 		while (cursor.hasNext()) {
 			Tile tile = documentToTile(cursor.next());
 			spawnNeighbors(tile, facingDirection);
+		}
+	}
+
+	/**
+	 * Determones if there would be a collision from a charcater moving to the
+	 * given location, and returns true if there are none and it is OK to move
+	 * there, or false otherwise.
+	 * 
+	 * @param newPlayerLocation
+	 *            the proposed new location
+	 * @return
+	 */
+	public static boolean clearToMove(facingDirections facingDirection, Coordinate newPlayerLocation) {
+		Bson filter = Filters.and(WorldMap.immediateNeighborFilter(facingDirection, newPlayerLocation, 0.8),
+				Filters.eq("walkable", false));
+		if (collection.count(filter) == 0) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 }

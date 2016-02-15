@@ -21,6 +21,13 @@ public class Tile {
 		this.walkable = walkable;
 	}
 	
+	public Tile(Coordinate location, String tileType) throws SlickException {
+		this.location = location;
+		this.tileType = tileType;
+		TileInfo tileInfo = new TileInfo(tileType);
+		this.walkable = tileInfo.isWalkable();
+	}
+	
 	//
 	// Clone a tile to a given location
 	//
