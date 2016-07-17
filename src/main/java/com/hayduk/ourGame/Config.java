@@ -42,6 +42,14 @@ public class Config {
 	}
 	
 	//
+	// The various game times in the game
+	//
+	// "normal" time takes 100 real hrs to go 6000 game years
+	//
+	public static final double NORMAL_GAME_MS_PER_UNIX_MS =  (6000.0 * GameTime.MS_PER_SOLAR_YEAR) / (100.0 * 3600000.0);
+	public static final double REAL_TIME_GAME_MS_PER_UNIX_MS = 1.0;
+	
+	//
 	// Calculated values
 	//
 	public static double getPixelsPerCubit() { 

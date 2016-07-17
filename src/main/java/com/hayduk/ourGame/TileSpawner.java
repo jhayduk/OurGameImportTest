@@ -14,6 +14,7 @@ public class TileSpawner {
 
 	//
 	// Given a neighboringTile, create a new tile at the given coordinates
+	//
 	public static Tile spawn(Tile neighboringTile, Coordinate newTileLocation) throws SlickException {
 		// First we need to get the typical characteristics for the neighboring tile
 		TileInfo neighboringTileInfo = new TileInfo(neighboringTile.getTileType());

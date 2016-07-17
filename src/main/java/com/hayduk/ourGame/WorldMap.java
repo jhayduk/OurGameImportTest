@@ -1,6 +1,7 @@
 package com.hayduk.ourGame;
 
 import java.security.InvalidParameterException;
+import java.util.Random;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -11,12 +12,23 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Filters;
 
-/***
- * This collection holds all of the tiles for the worldMap.
- *
- * Schema: { "x" : <double>, "y" : <double>, "traversable" : <boolean>,
- * "tileType" : <string> }
+/**
+ * This class is responsible for the tile on the worldMap.
+ * 
  */
+
+//
+// Example document from the worldMap collection
+//
+//{
+//	"_id" : ObjectId("570a8bed0faff47f8f4763d8"),
+//	"type" : "tile",
+//	"x" : -4,
+//	"y" : -4,
+//	"tileType" : "grass",
+//	"walkable" : true
+//}
+//
 
 public class WorldMap {
 
@@ -36,11 +48,11 @@ public class WorldMap {
 							yIndex * Config.getCubitsPerTile());
 					Coordinate location = new Coordinate(screenCenter.getX(), screenCenter.getY());
 					location.translate(translation);
-					Tile tile = new Tile(location, "grass", true);
-					insert(tile);
+					Tile tile = new Tile(location, "grass");
+					insertTile(tile);
 				}
 			}
-			collection.createIndex(new Document().append("x", 1).append("y", 1));
+			collection.createIndex(new Document().append("type",1).append("x", 1).append("y", 1));
 		}
 	}
 
@@ -71,25 +83,50 @@ public class WorldMap {
 			Coordinate newTileLocation = new Coordinate(tile.getLocation(), vector);
 			if (!locationHasTile(newTileLocation)) {
 				Tile newTile = TileSpawner.spawn(tile, newTileLocation);
-				insert(newTile);
+				insertTile(newTile);
+				// TODO - Need to spawn items more generically
+				if (newTile.getTileType().equalsIgnoreCase("grass")) {
+					Random random = new Random();
+					if (random.nextDouble() <= 0.10) {
+						Tile newItem = new Tile(newTile.getLocation(), "tomato (ripe)");
+						insertItem(newItem);
+					}
+				}
 			}
 		}
 	}
 
 	// Checks if a location on the map has a tile centered on it
 	private static boolean locationHasTile(Coordinate location) {
-		Bson filter = Filters.and(Filters.eq("x", location.getX()), Filters.eq("y", location.getY()));
+		Bson filter = Filters.and(
+				Filters.eq("type", "tile"),
+				Filters.eq("x", location.getX()),
+				Filters.eq("y", location.getY()));
 		return (collection.count(filter) != 0);
 	}
 
-	private static void insert(Tile tile) {
-		Document insertDocument = new Document().append("x", tile.getLocation().getX())
-				.append("y", tile.getLocation().getY()).append("tileType", tile.getTileType())
+	private static void insertTile(Tile tile) {
+		insert(tile, "tile");
+	}
+	
+	private static void insertItem(Tile tile) {
+		insert(tile, "item");
+		//-v JWH
+		System.out.println(tile);
+		//-^ JWH
+	}
+	
+	private static void insert(Tile tile, String tileType) {
+		Document insertDocument = new Document()
+				.append("type", tileType)
+				.append("x", tile.getLocation().getX())
+				.append("y", tile.getLocation().getY())
+				.append("tileType", tile.getTileType())
 				.append("walkable", tile.isWalkable());
-		collection.insertOne(insertDocument);
+		collection.insertOne(insertDocument);		
 	}
 
-	/***
+	/**
 	 * This takes a worldMap document and extracts only those fields required
 	 * for drawing a tile
 	 */
@@ -100,8 +137,8 @@ public class WorldMap {
 		return (tile);
 	}
 
-	/***
-	 * This takes a worldMap document and all tile fields
+	/**
+	 * This takes a worldMap document and extracts all tile fields
 	 */
 	private static Tile documentToTile(Document document) throws SlickException {
 		Tile tile = documentToDrawableTile(document);
@@ -120,19 +157,22 @@ public class WorldMap {
 		switch (facingDirection) {
 		case UP:
 			immediateNeighborFilter = Filters.and(
+					Filters.eq("type", "tile"),
 					Filters.gte("x", newPlayerLocation.getX() - (Config.getCubitsPerTile() * searchTileWidth)),
 					Filters.lte("x", newPlayerLocation.getX() + (Config.getCubitsPerTile() * searchTileWidth)),
 					Filters.gte("y", newPlayerLocation.getY()),
 					Filters.lte("y", newPlayerLocation.getY() + (Config.getCubitsPerTile() * searchTileWidth)));
 			break;
 		case RIGHT:
-			immediateNeighborFilter = Filters.and(Filters.gte("x", newPlayerLocation.getX()),
+			immediateNeighborFilter = Filters.and(Filters.eq("type", "tile"),
+					Filters.gte("x", newPlayerLocation.getX()),
 					Filters.lte("x", newPlayerLocation.getX() + (Config.getCubitsPerTile() * searchTileWidth)),
 					Filters.gte("y", newPlayerLocation.getY() - (Config.getCubitsPerTile() * searchTileWidth)),
 					Filters.lte("y", newPlayerLocation.getY() + (Config.getCubitsPerTile()) * searchTileWidth));
 			break;
 		case DOWN:
 			immediateNeighborFilter = Filters.and(
+					Filters.eq("type", "tile"),
 					Filters.gte("x", newPlayerLocation.getX() - (Config.getCubitsPerTile() * searchTileWidth)),
 					Filters.lte("x", newPlayerLocation.getX() + (Config.getCubitsPerTile() * searchTileWidth)),
 					Filters.gte("y", newPlayerLocation.getY() - (Config.getCubitsPerTile() * searchTileWidth)),
@@ -140,6 +180,7 @@ public class WorldMap {
 			break;
 		case LEFT:
 			immediateNeighborFilter = Filters.and(
+					Filters.eq("type", "tile"),
 					Filters.gte("x", newPlayerLocation.getX() - (Config.getCubitsPerTile() * searchTileWidth)),
 					Filters.lte("x", newPlayerLocation.getX()),
 					Filters.gte("y", newPlayerLocation.getY() - (Config.getCubitsPerTile() * searchTileWidth)),
@@ -173,7 +214,7 @@ public class WorldMap {
 	}
 
 	/**
-	 * Determones if there would be a collision from a charcater moving to the
+	 * Determines if there would be a collision from a character moving to the
 	 * given location, and returns true if there are none and it is OK to move
 	 * there, or false otherwise.
 	 * 

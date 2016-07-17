@@ -114,6 +114,16 @@ public class TileInfo {
 			tileInfo.setNeighboringTileTypes(neighboringTileTypes);
 			insert(tileInfo);
 			
+			tileInfo = new TileInfo("tomato", "src/images/tomato32.png", false);
+			neighboringTileTypes = new ArrayList<String>();
+			tileInfo.setNeighboringTileTypes(neighboringTileTypes);
+			insert(tileInfo);
+			
+			tileInfo = new TileInfo("tomato (ripe)", "src/images/tomato32ripe.png", false);
+			neighboringTileTypes = new ArrayList<String>();
+			tileInfo.setNeighboringTileTypes(neighboringTileTypes);
+			insert(tileInfo);
+			
 			collection.createIndex(new Document("tileType", 1));
 		}
 	}

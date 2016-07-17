@@ -29,18 +29,21 @@ public class OurGame extends BasicGame {
 	
 	@Override
 	public void init(GameContainer container) throws SlickException {
+		GameTime.postWindowInit();
 	}
 
 	@Override
 	public void render(GameContainer gameContainer, Graphics graphics) throws SlickException {
 		WorldMap.render();
 		Characters.render();
+		GameTime.render();
 	}
 
 	@Override
 	public void update(GameContainer container, int deltaMs) throws SlickException {
 		InputHandler.update(container, deltaMs);
 		WorldMap.update();
+		GameTime.update(deltaMs);
 	}
 
 	

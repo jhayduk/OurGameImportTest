@@ -3,7 +3,7 @@ package com.hayduk.ourGame;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
-/***
+/**
  * A single map tile in the game.
  */
 public class Tile {
@@ -15,12 +15,6 @@ public class Tile {
 	public Tile() {
 	}
 
-	public Tile(Coordinate location, String tileType, boolean walkable) throws SlickException {
-		this.location = location;
-		this.tileType = tileType;
-		this.walkable = walkable;
-	}
-	
 	public Tile(Coordinate location, String tileType) throws SlickException {
 		this.location = location;
 		this.tileType = tileType;

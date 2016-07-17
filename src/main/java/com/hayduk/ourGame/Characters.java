@@ -97,7 +97,7 @@ public class Characters {
 	}
 
 	/**
-	 * This takes a characters document and all character fields
+	 * This takes a characters document and extracts all character fields
 	 */
 	private static Character documentToCharacter(Document document) throws SlickException {
 		Character character = documentToDrawableCharacter(document);
