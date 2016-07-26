@@ -1,11 +1,14 @@
 {
   "description": "NodeJS-based test code for OurGame",
   "license": "GPL-2.0",
-  "repository" :
+  "repository":
     { "type" : "git",
       "url" : "https://github.com/jhayduk/OurGame"
     },
   "dependencies": {
     "mocha": "2.5.3"
+  },
+  "scripts": {
+    "test": "mocha test.js"
   }
 }
