@@ -3,7 +3,7 @@
 //
 var assert = require('assert');
 
-describe ('simple test', function(){
+describe('simple test', function(){
     it('works', function() {
         assert.equal('a', 'a');
     });
@@ -12,4 +12,12 @@ describe ('simple test', function(){
             throw 'Error!';
         });
     });
+});
+
+describe('simple async test', function() {
+  it('timeout works', function(done) {
+    setTimeout(function() {
+      done();
+    }, 25);
+  });
 });
