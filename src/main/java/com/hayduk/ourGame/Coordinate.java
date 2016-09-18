@@ -12,11 +12,20 @@ public class Coordinate {
 	protected double x;
 	protected double y;
 	
+	/**
+	 * Create a new coordinate at the center of the world
+	 */
 	public Coordinate() {
 		x = 0;
 		y = 0;
 	}
 
+	/**
+	 * Create a new coordinate based on x and y values in the given array
+	 * @param coordinates
+	 *            An array of two doubles with the x and y values to set the new
+	 *            coordinate to
+	 */
 	public Coordinate(double[] coordinates) {
 		if (coordinates.length != 2) {
 			throw new IllegalArgumentException("coordinates array must a length of exactly 2");
@@ -25,20 +34,30 @@ public class Coordinate {
 		y = coordinates[1];
 	}
 	
+	/**
+	 * Create a new coordinate with the given x and y values
+	 * @param x
+	 * @param y
+	 */
 	public Coordinate(double x, double y) {
 		this.x = x;
 		this.y = y;
 	}
 	
 	/**
-	 * Create a coordinate as a clone of an existing coordinate
+	 * Create a new coordinate as a clone of an existing coordinate
+	 * @param origin
 	 */
 	public Coordinate(Coordinate origin) {
 		x = origin.getX();
 		y = origin.getY();
 	}
 	
-	// Create a coordinate offset from another coordinate
+	/**
+	 * Create a coordinate offset from another coordinate
+	 * @param origin
+	 * @param translation
+	 */
 	public Coordinate(Coordinate origin, Vector translation) {
 		x = origin.getX() + translation.getX();
 		y = origin.getY() + translation.getY();
@@ -88,7 +107,10 @@ public class Coordinate {
 		return (getYPx() -Config.getHalfTileSizePx());
 	}
 
-	// Translate this coordinate by the given vector
+	/**
+	 * Translate (move) this coordinate by the given vector
+	 * @param translation
+	 */
 	public void translate(Vector translation) {
 		x += translation.getX();
 		y += translation.getY();
